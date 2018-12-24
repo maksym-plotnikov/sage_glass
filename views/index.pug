@@ -25,6 +25,10 @@ block content
                         a.btn.btn-primary(data-toggle="collapse", href=`#collapse${index}`, role="button", aria-expanded="false", aria-controls=`#collapse${index}`) Links
                 div.collapse(id=`collapse${index}` )
                     div.p-2
-                        pre.py-2=`> curl -H "Content-Range: bytes 0-1000/${item.size}" -X GET ${baseUrl}/files/get/${item.name}`
-                        pre.py-2=`> curl -X GET ${baseUrl}/files/getSize/${item.name}`
+                        div.d-flex.flex-column.flex-sm-row.justify-content-between.align-items-sm-center.py-2
+                            pre(id=`file-${item.size}-${index}`)=`curl -H "Content-Range: bytes 0-1000/${item.size}" -X GET ${baseUrl}/files/get/${item.name}`
+                            button.btn.btn-default.btn-xs.copy-link(type="button") Copy
+                        div.d-flex.flex-column.flex-sm-row.justify-content-between.align-items-sm-center.py-2
+                            pre(id=`size-${item.size}-${index}`)=`curl -X GET ${baseUrl}/files/getSize/${item.name}`
+                            button.btn.btn-default.btn-xs.copy-link(type="button") Copy
 
