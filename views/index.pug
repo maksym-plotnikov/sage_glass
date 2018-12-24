@@ -10,13 +10,15 @@ block content
                     input#uploadInput.form-control-file(type='file' name='upload')
                 button.btn.btn-primary(type='submit') Upload
     ul.list-group
-        each item in list
+        each item, index in list
             li.list-group-item
                 div.d-flex.justify-content-between.align-items-center
                     div
-                        span.mr-2=item.name
+                        span.mr-2(id=item.name)=item.name
                         span.mr-2 &ndash;
-                        span.mr-2=`${item.size} bytes`
+                        span.mr-2(id=item.size)=item.size
+                        span bytes
                     div
-                        button.btn.btn-primary.mr-2(type="button") Copy name
+                        button.btn.btn-primary.mr-2.copy-text(data-id=item.name, type="button") Copy name
+                        button.btn.btn-info.mr-2.copy-size(data-size=item.size, type="button") Copy size
                         button.delete.btn.btn-danger(data-item=item.name, type="button") Delete
