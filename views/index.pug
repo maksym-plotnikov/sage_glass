@@ -22,8 +22,9 @@ block content
                         button.btn.btn-primary.mr-0.mr-sm-2.mb-2.mb-sm-0.copy-text(data-id=item.name, type="button") Copy name
                         button.btn.btn-info.mr-0.mr-sm-2.mb-2.mb-sm-0.copy-size(data-size=item.size, type="button") Copy size
                         button.delete.btn.btn-danger.mr-0.mr-sm-2.mb-2.mb-sm-0(data-item=item.name, type="button") Delete
-                        a.btn.btn-primary(data-toggle="collapse", href=`#collapse${index}`, role="button", aria-expanded="false", aria-controls=`#collapse${index}`) Link
+                        a.btn.btn-primary(data-toggle="collapse", href=`#collapse${index}`, role="button", aria-expanded="false", aria-controls=`#collapse${index}`) Links
                 div.collapse(id=`collapse${index}` )
-                    div.p-3
-                        pre.p-3=`curl -d "file=${item.name}" -H "Content-Range: bytes 0-1000/${item.size}" -H "Content-Type: application/x-www-form-urlencoded" -X GET ${baseUrl}/files/get`
+                    div.p-2
+                        pre.py-2=`> curl -H "Content-Range: bytes 0-1000/${item.size}" -X GET ${baseUrl}/files/get/${item.name}`
+                        pre.py-2=`> curl -X GET ${baseUrl}/files/getSize/${item.name}`
 
