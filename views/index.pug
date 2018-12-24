@@ -10,7 +10,7 @@ block content
                     input#uploadInput.form-control-file(type='file' name='upload')
                 button.btn.btn-primary(type='submit') Upload
     ul.list-group
-        each item in list
+        each item, index in list
             li.list-group-item
                 div.d-flex.flex-column.flex-sm-row.justify-content-between.align-items-sm-center
                     div.p-2
@@ -21,4 +21,9 @@ block content
                     div.d-flex.flex-column.flex-sm-row.justify-content-start
                         button.btn.btn-primary.mr-0.mr-sm-2.mb-2.mb-sm-0.copy-text(data-id=item.name, type="button") Copy name
                         button.btn.btn-info.mr-0.mr-sm-2.mb-2.mb-sm-0.copy-size(data-size=item.size, type="button") Copy size
-                        button.delete.btn.btn-danger.mb-2.mb-sm-0(data-item=item.name, type="button") Delete
+                        button.delete.btn.btn-danger.mr-0.mr-sm-2.mb-2.mb-sm-0(data-item=item.name, type="button") Delete
+                        a.btn.btn-primary(data-toggle="collapse", href=`#collapse${index}`, role="button", aria-expanded="false", aria-controls=`#collapse${index}`) Link
+                div.collapse(id=`collapse${index}` )
+                    div.p-3
+                        pre.p-3=`curl -d "file=${item.name}" -H "Content-Range: bytes 0-1000/${item.size}" -H "Content-Type: application/x-www-form-urlencoded" -X GET ${baseUrl}/files/get`
+
