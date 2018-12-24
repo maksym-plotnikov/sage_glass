@@ -26,7 +26,6 @@ async function getFilesList(uploadPath) {
 async function readFileStream(filePath, res, req) {
   try {
     const [fileName] = await getFilesList(filePath);
-    console.log(fileName);
     if (fileName) {
       const {unit, first, last, length} = contentRange.parse(req.get("Content-Range"));
       console.log('Getting file:', `${filePath}/${fileName}`);
@@ -59,25 +58,26 @@ async function deleteFile(fileName, req, res) {
 
 
 router.get('/get', async (req, res, next) => {
-  const filesPath = `${req.rootPath}/uploads`;
+  const uploadPath = `${req.rootPath}/uploads`;
   try {
-    await readFileStream(filesPath, res, req);
+    await readFileStream(uploadPath, res, req);
   } catch ({message}) {
     console.log('ERROR:', (message || "Could not read file"));
     return res.status(500).json({message: (message || "Could not read file")});
   }
 });
 
-router.get('/getSize/:fileName', async (req, res, next) => {
-  const fileName = req.params.fileName;
+router.get('/getSize/', async (req, res, next) => {
+  const uploadPath = `${req.rootPath}/uploads`;
+  const [fileName] = await getFilesList(uploadPath);
   console.log("Requesting size for", fileName);
   if (fileName) {
-    const path = `${req.rootPath}/uploads/${fileName}`;
+    const path = `${uploadPath}/${fileName}`;
     const {size} = await getstats(path);
-    console.log("SIZE", size);
+    console.log("FILE SIZE", size);
     return res.status(200).json({name: fileName, fileSize: size});
   }
-  return res.status(404).json({message: "Please provide file name!"});
+  return res.status(404).json({message: "No files found"});
 });
 
 router.post('/delete', async (req, res, next) => {
