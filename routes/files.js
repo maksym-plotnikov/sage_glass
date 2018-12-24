@@ -5,7 +5,6 @@ const contentRange = require('content-range');
 const {promisify} = require('util');
 
 const rmfile = promisify(fs.unlink);
-const rdfile = promisify(fs.readFile);
 const getstats = promisify(fs.stat);
 
 function readFileStream(file, res, req) {

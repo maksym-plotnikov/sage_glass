@@ -37,7 +37,7 @@ async function getFilesList(rootPath) {
 /* GET home page. */
 router.get('/', async (req, res, next) => {
   const list = await getFilesList(req.rootPath);
-  const baseUrl = req.baseUrl;
+  const baseUrl = req.BASE_URL;
   res.render('index', {title: 'Upload form', baseUrl, list});
 });
 
