@@ -12,13 +12,13 @@ block content
     ul.list-group
         each item, index in list
             li.list-group-item
-                div.d-flex.justify-content-between.align-items-center
-                    div
+                div.d-flex.flex-column.flex-sm-row.justify-content-between.align-items-sm-center
+                    div.p-2
                         span.mr-2(id=item.name)=item.name
                         span.mr-2 &ndash;
                         span.mr-2(id=item.size)=item.size
                         span bytes
-                    div
-                        button.btn.btn-primary.mr-2.copy-text(data-id=item.name, type="button") Copy name
-                        button.btn.btn-info.mr-2.copy-size(data-size=item.size, type="button") Copy size
-                        button.delete.btn.btn-danger(data-item=item.name, type="button") Delete
+                    div.d-flex.flex-column.flex-sm-row.justify-content-start
+                        button.btn.btn-primary.mr-0.mr-sm-2.mb-2.mb-sm-0.copy-text(data-id=item.name, type="button") Copy name
+                        button.btn.btn-info.mr-0.mr-sm-2.mb-2.mb-sm-0.copy-size(data-size=item.size, type="button") Copy size
+                        button.delete.btn.btn-danger.mb-2.mb-sm-0(data-item=item.name, type="button") Delete
