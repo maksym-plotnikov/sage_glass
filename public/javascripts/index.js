@@ -12,21 +12,19 @@ $('button.delete').on('click', function () {
 });
 
 function CopyToClipboard(containerid) {
-  if (document.selection) {
-    const range = document.body.createTextRange();
-    range.moveToElementText(document.getElementById(containerid));
-    range.select().createTextRange();
-    document.execCommand("copy");
-  } else if (window.getSelection) {
-    var range = document.createRange();
+  if (window.getSelection) {
+    let range = document.createRange();
+    console.log(range.selectNode(document.getElementById(containerid)));
     range.selectNode(document.getElementById(containerid));
     window.getSelection().addRange(range);
     document.execCommand("copy");
+    window.getSelection().removeRange(range);
   }
 }
 
 $('.copy-text').on('click', function () {
   const itemId = $(this).attr("data-id");
+  console.log(itemId);
   CopyToClipboard(itemId);
 });
 
