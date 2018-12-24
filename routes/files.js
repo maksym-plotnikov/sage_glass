@@ -30,8 +30,8 @@ async function deleteFile(fileName, req, res) {
   }
 }
 
-router.get('/get', function (req, res, next) {
-  const fileName = req.body.file || req.query.file;
+router.get('/get/:fileName', function (req, res, next) {
+  const fileName = req.params.fileName;
   const filePath = `${req.rootPath}/uploads/${fileName}`;
   try {
     readFileStream(filePath, res, req);
@@ -41,8 +41,8 @@ router.get('/get', function (req, res, next) {
   }
 });
 
-router.get('/getSize', async (req, res, next) => {
-  const fileName = req.body.file || req.query.file;
+router.get('/getSize/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName;
   console.log("Requesting size for", fileName);
   if (fileName) {
     const path = `${req.rootPath}/uploads/${fileName}`;
