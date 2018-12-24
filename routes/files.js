@@ -4,18 +4,45 @@ const fs = require('fs');
 const contentRange = require('content-range');
 const {promisify} = require('util');
 
+const readdir = promisify(fs.readdir);
 const rmfile = promisify(fs.unlink);
 const getstats = promisify(fs.stat);
 
-function readFileStream(file, res, req) {
-  const {unit, first, last, length} = contentRange.parse(req.get("Content-Range"));
-  console.log('Getting file:', file);
-  console.log('for range:', `${first} - ${last}/${length} ${unit}`);
-  const stream = fs.createReadStream(file, {start: first, end: last - 1});
-  stream.pipe(res);
-  stream.on('error', ({message}) => {
-    return res.status(500).json({message});
-  });
+
+async function getFilesList(uploadPath) {
+  try {
+    const items = await readdir(uploadPath);
+    if (items != null && items.length > 0) {
+      return items;
+    } else {
+      return [];
+    }
+  } catch (e) {
+    console.log('ERROR:', e);
+    return [];
+  }
+}
+
+async function readFileStream(filePath, res, req) {
+  try {
+    const [fileName] = await getFilesList(filePath);
+    console.log(fileName);
+    if (fileName) {
+      const {unit, first, last, length} = contentRange.parse(req.get("Content-Range"));
+      console.log('Getting file:', `${filePath}/${fileName}`);
+      console.log('for range:', `${first} - ${last}/${length} ${unit}`);
+      const stream = fs.createReadStream(`${filePath}/${fileName}`, {start: first, end: last - 1});
+      stream.pipe(res);
+      stream.on('error', ({message}) => {
+        return res.status(500).json({message});
+      });
+    } else {
+      return res.status(404).json({message: "No files found"});
+    }
+  } catch ({message}) {
+    return res.status(404).json({message: message || "Unexpected error"});
+  }
+
 }
 
 async function deleteFile(fileName, req, res) {
@@ -26,15 +53,15 @@ async function deleteFile(fileName, req, res) {
   } catch (e) {
     console.log('ERROR:', e);
     const {message} = e;
-    return res.status(500).json({message});
+    return res.status(500).json({message: message || "no_file"});
   }
 }
 
-router.get('/get/:fileName', function (req, res, next) {
-  const fileName = req.params.fileName;
-  const filePath = `${req.rootPath}/uploads/${fileName}`;
+
+router.get('/get', async (req, res, next) => {
+  const filesPath = `${req.rootPath}/uploads`;
   try {
-    readFileStream(filePath, res, req);
+    await readFileStream(filesPath, res, req);
   } catch ({message}) {
     console.log('ERROR:', (message || "Could not read file"));
     return res.status(500).json({message: (message || "Could not read file")});
