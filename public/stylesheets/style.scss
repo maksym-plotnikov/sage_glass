@@ -1,0 +1,13 @@
+// Custom.scss
+// Includes  Bootstrap
+// Required
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+
+body {
+  padding: 50px 0;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  border: 0 none;
+}

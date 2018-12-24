@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    h1.mb-4=title
+    div.card
+        div.card-body
+            form#uploadForm.mb-4.mt-4(method='POST' action=`${baseUrl}/upload` encType="multipart/form-data")
+                div.form-group
+                    label(for='uploadInput') File:
+                    input#uploadInput.form-control-file(type='file' name='upload')
+                button.btn.btn-primary(type='submit') Upload
+    ul.list-group
+        each item in list
+            li.list-group-item
+                div.d-flex.justify-content-between.align-items-center
+                    div
+                        span.mr-2=item.name
+                        span.mr-2 &ndash;
+                        span.mr-2=`${item.size} bytes`
+                    div
+                        button.btn.btn-primary.mr-2(type="button") Copy name
+                        button.delete.btn.btn-danger(data-item=item.name, type="button") Delete
