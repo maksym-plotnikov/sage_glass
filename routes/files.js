@@ -30,10 +30,10 @@ async function readFileStream(filePath, res, req) {
       const {unit, first, last, length} = contentRange.parse(req.get("Content-Range"));
       console.log('Getting file:', `${filePath}/${fileName}`);
       console.log('for range:', `${first} - ${last}/${length} ${unit}`);
-      const stream = fs.createReadStream(`${filePath}/${fileName}`, {start: first, end: last - 1});
+      const stream = fs.createReadStream(`${filePath}/${fileName}`, {start: first, end: last, encoding: "binary", autoClose: true});
       stream.pipe(res);
       stream.on('error', ({message}) => {
-        return res.status(500).json({message});
+        return res.status(500).json({message: message || "File read error"});
       });
     } else {
       return res.status(404).json({message: "No files found"});
