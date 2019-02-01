@@ -9,6 +9,7 @@ const indexRouter = require('./routes/index');
 const testRouter = require('./routes/test');
 const uploadRouter = require('./routes/upload');
 const filesRouter = require('./routes/files');
+const PSNModule = require('./modules/PSN');
 
 
 const app = express();
@@ -43,11 +44,14 @@ app.use('/', indexRouter);
 app.use('/ping', testRouter);
 app.use('/upload', uploadRouter);
 app.use('/files', filesRouter);
+// Make POST request
+PSNModule.postRequest(process.env.DEVICE_URL, __dirname);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
+
 
 // error handler
 app.use(function (err, req, res, next) {
