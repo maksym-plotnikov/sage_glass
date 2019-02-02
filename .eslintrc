@@ -12,8 +12,9 @@
   },
   "rules": {
     "comma-dangle": [2, "never"],
+    "no-console": 0,
     "max-len": [2, {
-      "code": 100,
+      "code": 200,
       "tabWidth": 2
     }],
     "semi": 2,

@@ -1,7 +1,10 @@
 const http = require("http");
+
+const fs = require('fs');
 const hostname = "0.0.0.0";
 const port = 3000;
 let counter = 0;
+
 const server = http.createServer((req, res) => {
   console.log(`\n${req.method} ${req.url}`);
   console.log(req.headers);
@@ -13,9 +16,9 @@ const server = http.createServer((req, res) => {
   console.log(counter);
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
-  if(counter > 10) {
+  if (counter > 10) {
     counter = 0;
-    res.end("LALALAL");
+    res.end("STOP!!!");
   }
   res.end("SENDCHUNK\n                                                                                                                      ");
 });

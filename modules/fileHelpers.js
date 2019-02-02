@@ -6,7 +6,7 @@ const readdir = promisify(fs.readdir);
 const rmfile = promisify(fs.unlink);
 
 module.exports = {
-  getFilesList: async (uploadPath) => {
+  getFilesList: async uploadPath => {
     try {
       const items = await readdir(uploadPath);
       if (items != null && items.length > 0) {
@@ -19,38 +19,42 @@ module.exports = {
       return [];
     }
   },
-  getStats: async (path) => {
+  getStats: async path => {
     return getstats(path);
   },
-  readFileStream: async (filePath, res, req) => {
+  openFile: async (path, first, last, res = null) => {
+    fs.open(path, 'r', (err, fd) => {
+      if (err) throw err;
+      fs.fstat(fd, (err, stat) => {
+        if (err) throw err;
+        // use stat
+        console.log('File', stat);
+
+        const stream = fs.createReadStream(path, {
+          start: first,
+          end: last,
+          autoClose: true
+        });
+        stream.pipe(res);
+        stream.on('error', ({message}) => {
+          return res.status(500).json({message: message || "File read error"});
+        });
+
+        fs.close(fd, (err) => {
+          if (err) throw err;
+        });
+      });
+    });
+  },
+  readFileStream: async (uploadPath, res, req) => {
     try {
-      const [fileName] = await getFilesList(filePath);
+      const [fileName] = await getFilesList(uploadPath);
       if (fileName) {
         const {unit, first, last, length} = contentRange.parse(req.get("Content-Range"));
-        console.log('Getting file:', `${filePath}/${fileName}`);
+        const filePath =  `${uploadPath}/${fileName}`
+        console.log('Getting file:', filePath);
         console.log('for range:', `${first} - ${last}/${length} ${unit}`);
-        fs.open(`${filePath}/${fileName}`, 'r', (err, fd) => {
-          if (err) throw err;
-          fs.fstat(fd, (err, stat) => {
-            if (err) throw err;
-            // use stat
-            console.log('File', stat);
-
-            const stream = fs.createReadStream(`${filePath}/${fileName}`, {
-              start: first,
-              end: last,
-              autoClose: true
-            });
-            stream.pipe(res);
-            stream.on('error', ({message}) => {
-              return res.status(500).json({message: message || "File read error"});
-            });
-
-            fs.close(fd, (err) => {
-              if (err) throw err;
-            });
-          });
-        });
+        await openFile(filePath, first, last, res);
       } else {
         return res.status(404).json({message: "No files found"});
       }

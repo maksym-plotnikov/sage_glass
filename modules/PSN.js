@@ -1,4 +1,5 @@
 const rp = require('request-promise-native');
+const fs = require('fs');
 const qs = require('querystring');
 const FileHelpers = require('../modules/fileHelpers');
 const dateFormat = require('dateformat');
@@ -33,22 +34,53 @@ module.exports = {
         const result = pattern.test(parsedBody);
         console.log('RESULT:', result);
         console.log('parsedBody:', parsedBody.length);
-        let counter = 0;
+        let start = 0;
+        let end = 127;
+
         if (result) {
-          for (let i = counter; i < 10; i++) {
-            const res = await rp(OPTIONS);
-            counter = i;
-            if (!pattern.test(res)) {
-              break;
+          console.log('STARTING TO SEND DATA...');
+          for (let i = 0; i <2 ; i++) {
+            try {
+              const res = await rp({
+                  url,
+                  method: 'POST',
+                  headers: {
+                    'cache-control': 'no-cache',
+                    'content-disposition': 'attachment; filename=' + fileName,
+                    'content-type' : 'image/jpg',
+                    'authorization' : 'Basic token'
+                  },
+                  encoding: null,
+                  body: fs.createReadStream(path, {
+                    start,
+                    end,
+                    autoClose: true
+                  })
+                },
+              (error, response) => {
+                if (error) {
+                  console.log(error.message);
+                } else {
+                  console.log("Device response: ", response.body.toString());
+                }
+              });
+              start += (end + 1);
+              end += start;
+              if (!pattern.test(res)) {
+                break;
+              }
+            } catch ({message}) {
+              console.log('ERROR:', (message || "Could not read file"));
             }
+
           }
         }
-        console.log('COUNTER', counter);
       } else {
-        return new Error("No files");
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error("There is no files inside /uploads directory");
       }
-    } catch (e) {
-      console.log("err", e);
+    } catch ({message}) {
+      console.log("ERROR:", message);
     }
   }
 };
