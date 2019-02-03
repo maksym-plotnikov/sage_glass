@@ -5,6 +5,21 @@ const dateFormat = require('dateformat');
 const {Transform} = require('stream');
 
 const CHUNK_SIZE = process.env.CHUNK_SIZE;
+const CHUNK_FILLER = process.env.CHUNK_FILLER;
+const MAJOR_VERSION = process.env.MAJOR_VERSION;
+const MINOR_VERSION = process.env.MINOR_VERSION;
+const BUILD_VERSION = process.env.BUILD_VERSION;
+const APP_SLOT = process.env.APP_SLOT;
+
+const POST_OPTIONS = {
+  method: 'POST',
+  headers: {
+    'cache-control': 'no-cache',
+    'content-type': 'file/binary',
+    'authorization': 'Basic token'
+  },
+  encoding: null
+};
 
 
 class ChunkTransformer extends Transform {
@@ -13,9 +28,8 @@ class ChunkTransformer extends Transform {
   }
 
   _transform(chunk, enc, done) {
-    console.log('CHUNK_SIZE', CHUNK_SIZE);
     if (chunk.length < CHUNK_SIZE) {
-      chunk = chunk.toString().padEnd(CHUNK_SIZE, '0');
+      chunk = chunk.toString().padEnd(CHUNK_SIZE, CHUNK_FILLER);
     }
     this.push(chunk);
     done();
@@ -38,39 +52,30 @@ module.exports = {
           method: 'POST',
           uri: url,
           body: {
-            major: 1,
-            minor: 1,
-            build: 1,
+            major: MAJOR_VERSION,
+            minor: MINOR_VERSION,
+            build: BUILD_VERSION,
             bytes: size,
             time: date,
-            slot: 1
+            slot: APP_SLOT
           },
           json: true
         };
         const parsedBody = await rp(OPTIONS);
         const pattern = /^SENDCHUNK/i;
         const result = pattern.test(parsedBody);
-        console.log('RESULT:', result);
+        console.log('Device is ready:', result);
         let start = 0;
         let end = CHUNK_SIZE - 1;
         const loopNumber = Math.ceil(size / CHUNK_SIZE);
-
         if (result) {
           console.log('STARTING TO SEND DATA...');
           for (let i = 0; i <= loopNumber; i++) {
-            console.log('i === loopNumber', i === loopNumber);
-            if(i === loopNumber) {
+            if (i === loopNumber) {
               await rp({
                   url,
-                  method: 'POST',
-                  headers: {
-                    'cache-control': 'no-cache',
-                    'content-disposition': 'attachment; filename=' + fileName,
-                    'content-type': 'file/binary',
-                    'authorization': 'Basic token'
-                  },
-                  encoding: null,
-                  body: 'END.END.END.END.END.END.END.END.END.END.                                                                                        '
+                  body: 'END.END.END.END.END.END.END.END.END.END.                                                                                        ',
+                  ...POST_OPTIONS
                 },
                 (error, response) => {
                   if (error) {
@@ -89,15 +94,8 @@ module.exports = {
               });
               const res = await rp({
                   url,
-                  method: 'POST',
-                  headers: {
-                    'cache-control': 'no-cache',
-                    'content-disposition': 'attachment; filename=' + fileName,
-                    'content-type': 'file/binary',
-                    'authorization': 'Basic token'
-                  },
-                  encoding: null,
-                  body: readable.pipe(new ChunkTransformer())
+                  body: readable.pipe(new ChunkTransformer()),
+                  ...POST_OPTIONS
                 },
                 (error, response) => {
                   if (error) {
