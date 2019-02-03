@@ -46,7 +46,7 @@ app.use('/ping', testRouter);
 app.use('/upload', uploadRouter);
 app.use('/files', filesRouter);
 // Make POST request
-PSNModule.postRequest(process.env.DEVICE_URL, __dirname);
+PSNModule.postRequest(__dirname);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

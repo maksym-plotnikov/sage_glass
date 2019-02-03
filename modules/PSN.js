@@ -4,6 +4,8 @@ const FileHelpers = require('../modules/fileHelpers');
 const dateFormat = require('dateformat');
 const {Transform} = require('stream');
 
+// CONSTANTS FROM .env
+const DEVICE_URL = process.env.DEVICE_URL;
 const CHUNK_SIZE = process.env.CHUNK_SIZE;
 const CHUNK_FILLER = process.env.CHUNK_FILLER;
 const MAJOR_VERSION = process.env.MAJOR_VERSION;
@@ -12,15 +14,15 @@ const BUILD_VERSION = process.env.BUILD_VERSION;
 const APP_SLOT = process.env.APP_SLOT;
 
 const POST_OPTIONS = {
+  url: DEVICE_URL,
   method: 'POST',
   headers: {
     'cache-control': 'no-cache',
-    'content-type': 'file/binary',
+    'content-type': 'application/octet-sstream',
     'authorization': 'Basic token'
   },
   encoding: null
 };
-
 
 class ChunkTransformer extends Transform {
   constructor() {
@@ -37,7 +39,7 @@ class ChunkTransformer extends Transform {
 }
 
 module.exports = {
-  postRequest: async (url, rootPath) => {
+  postRequest: async (rootPath) => {
     console.log(`Getting Filesize...`);
     const uploadPath = `${rootPath}/uploads`;
     try {
@@ -47,10 +49,10 @@ module.exports = {
         const path = `${uploadPath}/${fileName}`;
         const {size} = await FileHelpers.getStats(path);
         console.log("FILE SIZE:", size);
-        console.log(`Sending POST to: ${url}...`);
+        console.log(`Sending POST to: ${DEVICE_URL}...`);
         const OPTIONS = {
           method: 'POST',
-          uri: url,
+          uri: DEVICE_URL,
           body: {
             major: MAJOR_VERSION,
             minor: MINOR_VERSION,
@@ -73,8 +75,7 @@ module.exports = {
           for (let i = 0; i <= loopNumber; i++) {
             if (i === loopNumber) {
               await rp({
-                  url,
-                  body: 'END.END.END.END.END.END.END.END.END.END.                                                                                        ',
+                  body: 'END.END.END.END.END.END.END.END.END.END.'.padEnd(CHUNK_SIZE, CHUNK_FILLER),
                   ...POST_OPTIONS
                 },
                 (error, response) => {
@@ -93,7 +94,6 @@ module.exports = {
                 autoClose: true
               });
               const res = await rp({
-                  url,
                   body: readable.pipe(new ChunkTransformer()),
                   ...POST_OPTIONS
                 },
@@ -112,7 +112,6 @@ module.exports = {
             } catch ({message}) {
               console.log('ERROR:', (message || "Could not read file"));
             }
-
           }
         }
       } else {
