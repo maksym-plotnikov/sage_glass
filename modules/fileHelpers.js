@@ -7,6 +7,7 @@ const rmfile = promisify(fs.unlink);
 
 module.exports = {
   getFilesList: async uploadPath => {
+    const path = uploadPath;
     try {
       const items = await readdir(uploadPath);
       if (items != null && items.length > 0) {

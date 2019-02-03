@@ -1,6 +1,4 @@
 const http = require("http");
-
-const fs = require('fs');
 const hostname = "0.0.0.0";
 const port = 3000;
 let counter = 0;
@@ -11,12 +9,13 @@ const server = http.createServer((req, res) => {
 
   req.on("data", (chunk) => {
     console.log("BODY: " + chunk);
+    console.log("LENGTH: " + chunk.length);
     counter++;
   });
   console.log(counter);
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
-  if (counter > 10) {
+  if (counter > 3) {
     counter = 0;
     res.end("STOP!!!");
   }
