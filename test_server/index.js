@@ -15,7 +15,7 @@ const server = http.createServer((req, res) => {
   console.log(counter);
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
-  if (counter > 3) {
+  if (counter > 10) {
     counter = 0;
     res.end("STOP!!!");
   }

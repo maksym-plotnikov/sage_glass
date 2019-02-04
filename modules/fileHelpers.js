@@ -5,13 +5,23 @@ const getstats = promisify(fs.stat);
 const readdir = promisify(fs.readdir);
 const rmfile = promisify(fs.unlink);
 
-module.exports = {
+const FileHelpers = {
+  getSize: async (uploadPath, items) => {
+    const array = [];
+    await Promise.all(items.map(async item => {
+
+      const file = `${uploadPath}/${item}`;
+      const stats = await getstats(file);
+      array.push({name: item, size: stats.size});
+    }));
+    return array;
+  },
   getFilesList: async uploadPath => {
-    const path = uploadPath;
     try {
       const items = await readdir(uploadPath);
-      if (items != null && items.length > 0) {
-        return items;
+      const list = await FileHelpers.getSize(uploadPath, items);
+      if (list != null && list.length > 0) {
+        return list.filter(item => !(/^\./g).test(item.name));
       } else {
         return [];
       }
@@ -49,7 +59,8 @@ module.exports = {
   },
   readFileStream: async (uploadPath, res, req) => {
     try {
-      const [fileName] = await getFilesList(uploadPath);
+      const [fileName] = await FileHelpers.getFilesList(uploadPath);
+      console.log(console.log(fileName));
       if (fileName) {
         const {unit, first, last, length} = contentRange.parse(req.get("Content-Range"));
         const filePath =  `${uploadPath}/${fileName}`
@@ -76,3 +87,5 @@ module.exports = {
     }
   }
 };
+
+module.exports = FileHelpers;

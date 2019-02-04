@@ -17,8 +17,8 @@ router.get('/getSize/', async (req, res, next) => {
   const uploadPath = `${req.rootPath}/uploads`;
   const [fileName] = await FileHelpers.getFilesList(uploadPath);
   console.log("Requesting size for", fileName);
-  if (fileName) {
-    const path = `${uploadPath}/${fileName}`;
+  if (fileName && fileName.name) {
+    const path = `${uploadPath}/${fileName.name}`;
     const size = await FileHelpers.getStats(path);
     console.log("FILE SIZE", size);
     return res.status(200).json({name: fileName, fileSize: size});

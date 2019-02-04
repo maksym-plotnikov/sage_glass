@@ -6,7 +6,7 @@ const {Transform} = require('stream');
 
 // CONSTANTS FROM .env
 const DEVICE_URL = process.env.DEVICE_URL;
-const CHUNK_SIZE = process.env.CHUNK_SIZE;
+const CHUNK_SIZE = +process.env.CHUNK_SIZE;
 const CHUNK_FILLER = process.env.CHUNK_FILLER;
 const MAJOR_VERSION = process.env.MAJOR_VERSION;
 const MINOR_VERSION = process.env.MINOR_VERSION;
@@ -30,6 +30,7 @@ class ChunkTransformer extends Transform {
   }
 
   _transform(chunk, enc, done) {
+    console.log('TRANSFORM', chunk.length, CHUNK_SIZE);
     if (chunk.length < CHUNK_SIZE) {
       chunk = chunk.toString().padEnd(CHUNK_SIZE, CHUNK_FILLER);
     }
@@ -45,8 +46,8 @@ module.exports = {
     try {
       const [fileName] = await FileHelpers.getFilesList(uploadPath);
       const date = dateFormat(new Date(), "yyyymmddhhMMss");
-      if (fileName) {
-        const path = `${uploadPath}/${fileName}`;
+      if (fileName && fileName.name) {
+        const path = `${uploadPath}/${fileName.name}`;
         const {size} = await FileHelpers.getStats(path);
         console.log("FILE SIZE:", size);
         console.log(`Sending POST to: ${DEVICE_URL}...`);
@@ -69,7 +70,11 @@ module.exports = {
         console.log('Device is ready:', result);
         let start = 0;
         let end = CHUNK_SIZE - 1;
+        console.log(CHUNK_SIZE, typeof CHUNK_SIZE);
+        console.log(start, typeof start);
+        console.log(end, typeof end);
         const loopNumber = Math.ceil(size / CHUNK_SIZE);
+        console.log('loopNumber', loopNumber);
         if (result) {
           console.log('STARTING TO SEND DATA...');
           for (let i = 0; i <= loopNumber; i++) {
@@ -104,8 +109,8 @@ module.exports = {
                     console.log("Device response: ", response.body.toString());
                   }
                 });
-              start += (end + 1);
-              end += start;
+              start += CHUNK_SIZE;
+              end += CHUNK_SIZE;
               if (!pattern.test(res)) {
                 break;
               }
