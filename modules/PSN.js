@@ -54,16 +54,24 @@ module.exports = {
         console.log(`Sending POST to: ${DEVICE_URL}...`);
         const OPTIONS = {
           uri: DEVICE_URL,
-          body: {
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
             major: +MAJOR_VERSION,
             minor: +MINOR_VERSION,
             build: +BUILD_VERSION,
             bytes: size,
             time: date,
             slot: +APP_SLOT
-          },
+          }),
           simple: true,
-          json: true
+          transform: function (body, response, resolveWithFullResponse) {
+            console.log('transform response', response);
+            console.log('transform body', body);
+            console.log('transform resolveWithFullResponse', resolveWithFullResponse);
+          },
+          json: false
         };
         let parsedBody;
         try {
