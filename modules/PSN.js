@@ -55,12 +55,12 @@ module.exports = {
           method: 'POST',
           uri: DEVICE_URL,
           body: {
-            major: MAJOR_VERSION,
-            minor: MINOR_VERSION,
-            build: BUILD_VERSION,
+            major: +MAJOR_VERSION,
+            minor: +MINOR_VERSION,
+            build: +BUILD_VERSION,
             bytes: size,
             time: date,
-            slot: APP_SLOT
+            slot: +APP_SLOT
           },
           json: true
         };
