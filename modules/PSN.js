@@ -29,7 +29,6 @@ class ChunkTransformer extends Transform {
   constructor() {
     super();
   }
-
   _transform(chunk, enc, done) {
     if (chunk.length < CHUNK_SIZE) {
       const end = CHUNK_SIZE - chunk.length;
