@@ -3,7 +3,6 @@ const fs = require('fs');
 const FileHelpers = require('../modules/fileHelpers');
 const dateFormat = require('dateformat');
 const {Transform} = require('stream');
-const fill = require('buffer-fill');
 
 // CONSTANTS FROM .env
 const DEVICE_URL = process.env.DEVICE_URL;
