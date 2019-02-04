@@ -62,6 +62,7 @@ module.exports = {
             time: date,
             slot: +APP_SLOT
           },
+          simple: true,
           json: true
         };
         const parsedBody = await rp(OPTIONS);
