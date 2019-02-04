@@ -74,17 +74,12 @@ module.exports = {
           json: false
         };
         let parsedBody;
-        try {
-          parsedBody = await rp.post(OPTIONS, function (error, response, body) {
-            console.log('request response', response);
-            console.log('request error', error);
-            console.log('request body', body);
-          });
-        } catch (err) {
-          console.log('catched error', err);
-        } finally {
-          console.log('finally', parsedBody);
-        }
+
+        parsedBody = await rp(OPTIONS).catch(errors.TransformError, function (reason) {
+          console.log(reason); // => Transform failed!
+          // reason.response is the original response for which the transform operation failed
+        });
+        console.log('parsedBody', parsedBody);
         const pattern = /^SENDCHUNK/i;
         const result = pattern.test(parsedBody);
         console.log('Device is ready:', result);
