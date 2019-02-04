@@ -63,6 +63,11 @@ module.exports = {
             slot: +APP_SLOT
           },
           simple: true,
+          transform: function (body, response, resolveWithFullResponse) {
+            console.log(response);
+            console.log(body);
+            throw new Error('Transform failed!');
+          },
           json: true
         };
         const parsedBody = await rp(OPTIONS);
@@ -104,6 +109,7 @@ module.exports = {
                   ...POST_OPTIONS
                 },
                 (error, response) => {
+                console.log(response);
                   if (error) {
                     console.log(error.message);
                   } else {
