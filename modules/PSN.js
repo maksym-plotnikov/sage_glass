@@ -3,6 +3,7 @@ const fs = require('fs');
 const FileHelpers = require('../modules/fileHelpers');
 const dateFormat = require('dateformat');
 const {Transform} = require('stream');
+const fill = require('buffer-fill');
 
 // CONSTANTS FROM .env
 const DEVICE_URL = process.env.DEVICE_URL;
@@ -31,7 +32,9 @@ class ChunkTransformer extends Transform {
 
   _transform(chunk, enc, done) {
     if (chunk.length < CHUNK_SIZE) {
-      chunk = chunk.toString().padEnd(CHUNK_SIZE, CHUNK_FILLER);
+      const end = CHUNK_SIZE - chunk.length;
+      const fillBuffer = Buffer.alloc(end, CHUNK_FILLER);
+      chunk = Buffer.concat([chunk, fillBuffer]);
     }
     this.push(chunk);
     done();
