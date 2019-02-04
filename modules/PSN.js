@@ -30,7 +30,6 @@ class ChunkTransformer extends Transform {
   }
 
   _transform(chunk, enc, done) {
-    console.log('TRANSFORM', chunk.length, CHUNK_SIZE);
     if (chunk.length < CHUNK_SIZE) {
       chunk = chunk.toString().padEnd(CHUNK_SIZE, CHUNK_FILLER);
     }
@@ -106,7 +105,7 @@ module.exports = {
                   if (error) {
                     console.log(error.message);
                   } else {
-                    console.log("Device response: ", response.body.toString());
+                    console.log("Device response: ", response.body.toString().trim());
                   }
                 });
               start += CHUNK_SIZE;
