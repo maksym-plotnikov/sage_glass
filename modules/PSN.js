@@ -28,6 +28,7 @@ class ChunkTransformer extends Transform {
   constructor() {
     super();
   }
+
   _transform(chunk, enc, done) {
     if (chunk.length < CHUNK_SIZE) {
       const end = CHUNK_SIZE - chunk.length;
@@ -52,7 +53,6 @@ module.exports = {
         console.log("FILE SIZE:", size);
         console.log(`Sending POST to: ${DEVICE_URL}...`);
         const OPTIONS = {
-          method: 'POST',
           uri: DEVICE_URL,
           body: {
             major: +MAJOR_VERSION,
@@ -63,14 +63,20 @@ module.exports = {
             slot: +APP_SLOT
           },
           simple: true,
-          transform: function (body, response, resolveWithFullResponse) {
-            console.log(response);
-            console.log(body);
-            throw new Error('Transform failed!');
-          },
           json: true
         };
-        const parsedBody = await rp(OPTIONS);
+        let parsedBody;
+        try {
+          parsedBody = await rp.post(OPTIONS, function (error, response, body) {
+            console.log('request response', response);
+            console.log('request error', error);
+            console.log('request body', body);
+          });
+        } catch (err) {
+          console.log('catched error', err);
+        } finally {
+          console.log('finally', parsedBody);
+        }
         const pattern = /^SENDCHUNK/i;
         const result = pattern.test(parsedBody);
         console.log('Device is ready:', result);
@@ -109,7 +115,7 @@ module.exports = {
                   ...POST_OPTIONS
                 },
                 (error, response) => {
-                console.log(response);
+                  console.log(response);
                   if (error) {
                     console.log(error.message);
                   } else {
@@ -130,8 +136,8 @@ module.exports = {
         // noinspection ExceptionCaughtLocallyJS
         throw new Error("There is no files inside /uploads directory");
       }
-    } catch ({message}) {
-      console.log("ERROR:", message);
+    } catch (e) {
+      console.log("ERROR:", e);
     }
   }
 };
