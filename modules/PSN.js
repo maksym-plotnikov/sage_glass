@@ -41,7 +41,7 @@ class ChunkTransformer extends Transform {
 }
 
 module.exports = {
-  postRequest: async (rootPath) => {
+  postRequest: async rootPath => {
     console.log(`Getting Filesize...`);
     const uploadPath = `${rootPath}/uploads`;
     try {
