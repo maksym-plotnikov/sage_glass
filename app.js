@@ -3,6 +3,7 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const logger = require('morgan');
 const sassMiddleware = require('node-sass-middleware');
 const fileUpload = require('express-fileupload');
@@ -25,10 +26,12 @@ app.use((req, res, next) => {
   next();
 });
 
-
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+
 
 app.use(fileUpload());
 app.use(cookieParser());

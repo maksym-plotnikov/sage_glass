@@ -66,19 +66,9 @@ module.exports = {
             slot: +APP_SLOT
           }),
           simple: true,
-          transform: function (body, response, resolveWithFullResponse) {
-            console.log('transform response', response);
-            console.log('transform body', body);
-            console.log('transform resolveWithFullResponse', resolveWithFullResponse);
-          },
           json: false
         };
-        let parsedBody;
-
-        parsedBody = await rp(OPTIONS).catch(errors.TransformError, function (reason) {
-          console.log(reason); // => Transform failed!
-          // reason.response is the original response for which the transform operation failed
-        });
+        const parsedBody = await rp(OPTIONS);
         console.log('parsedBody', parsedBody);
         const pattern = /^SENDCHUNK/i;
         const result = pattern.test(parsedBody);
